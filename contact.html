@@ -1,6 +1,63 @@
+<?php
+
+$conn=mysqli_connect("localhost","root","","gym");
+if(isset($_POST['submit']))
+{
+     $weburl=mysqli_real_escape_string( $conn,$_POST['weburl']);	
+	$username=mysqli_real_escape_string( $conn,$_POST['username']);	
+	$email=mysqli_real_escape_string( $conn,$_POST['email']);	
+	$password=mysqli_real_escape_string( $conn,$_POST['password']);	
+	$confirm=mysqli_real_escape_string( $conn,$_POST['confirm']);
+	$mobile=mysqli_real_escape_string( $conn,$_POST['mobile']);
+	$message=mysqli_real_escape_string( $conn,$_POST['message']);
+	
+	$pass=password_hash($password,PASSWORD_BCRYPT);
+	$con=password_hash($confirm,PASSWORD_BCRYPT);
+	
+	$emailquery="select * from contact where email='$email'";
+	$query=mysqli_query($conn,$emailquery);
+	
+	$emailcount=mysqli_num_rows($query);
+	if($emailcount>0)
+	{
+		echo "email already exists";
+	}
+	else
+	{
+		if($password===$confirm)
+		{
+		
+         $insert="Insert into contact (weburl,username,email,password,confirm,mobile,message) Values('$weburl','$username',
+		 '$email','$pass','$con','$mobile','$message')";  
+          $iquery=mysqli_query($conn,$insert);	
+         
+       if($conn)
+	   {
+		   echo "inserted";
+	   }		   
+		
+   else
+   {	
+     echo "not inserted";
+    }
+			
+		   
+		
+	}
+}
+}
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<?php
+session_start();
+?>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +76,6 @@
 <link rel='stylesheet' href='css/hizoom.css'>
 </head>
 <body id="default_theme" class="contact_us">
-<div class="bg_load"> <img class="loader_animation" src="images/loaders/loader_1.png" alt="#" /> </div>
 
 <header id="default_header" class="header_style_1">
   <div class="header_top">
@@ -62,8 +118,18 @@
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">        
           <div class="menu_side">
             <div id="navbar_menu">
-              <ul class="first-ul"><li> <a  href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li> <a href="gallery.html">Gallery</a></li> <li> <a href="service.html" >Services</a></li><li> <a class="active" href="contact.html">Contact</a>      
-                </li>  </ul></div>    </div> </div> </div> </div>                                                             
+              <ul class="first-ul"><li> <a  href="index.php">Home</a></li>
+			  <li><a href="about.php">About Us</a></li>
+			  <li> <a href="gallery.php">Gallery</a></li>
+			  <li> <a href="service.php" >Services</a></li>
+			  <li> <a class="active" href="contact.php">Contact</a>      
+                </li> 
+				</ul>
+				</div>
+				</div>
+			</div> 
+		</div>
+	</div>                                                             
   </div>
 
 </header>
@@ -76,7 +142,7 @@
             <div class="title-holder-cell text-left">
               <h1 class="page-title">Contact</h1>
               <ol class="breadcrumb">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.php">Home</a></li>
                 <li class="active">Contact</li> </ol> </div>  </div>  </div>   </div>  </div> </div>                                           
 </div>
 <div class="section padding_layout_1">
@@ -115,25 +181,43 @@
               <h4>GET IN TOUCH</h4>
               <p>Our goal is to provide the best customer service and to answer all of your questions in a timely manner.</p>
               <div class="form_section">
-                <form class="form_contant" action="index.html">
+                <form class="form-horizontal" method="post" action="<?php 
+					echo htmlentities($_SERVER['PHP_SELF']);?>">
                   <fieldset>
                   <div class="row">
                     <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                      <input class="field_custom" placeholder="Websire URL" type="text" required />
+                      <input class="field_custom" placeholder="Websire URL" type="text"  name="weburl"required />
                     </div>
                     <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                      <input class="field_custom" placeholder="Your name" type="text" required />
+                      <input class="field_custom" placeholder="Your name" type="text" name="username" required />
                     </div>
                     <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                      <input class="field_custom" placeholder="Email adress" type="email" required />
+                      <input class="field_custom" name="email" placeholder="Email adress" type="email" name="email" required />
                     </div>
                     <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                      <input class="field_custom" placeholder="Phone number" type="text" required />
+				
+                      <input class="field_custom" placeholder="Password: Must be 8 char long" name="password" type="text" required  aria-hidden="true"  class="fa fa-lock fa-lg " 
+					  />
+					  	
                     </div>
+					
+					 <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                      <input class="field_custom" placeholder="confirm" name="confirm" type="text" required />
+                    </div>
+					
+					 <div class="field col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                      <input class="field_custom" placeholder="mobile" name="mobile" type="text" required />
+                    </div>
+					
                     <div class="field col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                      <textarea class="field_custom" placeholder="Messager" required ></textarea>
+                      <textarea class="field_custom" placeholder="message"name="message" required ></textarea>
                     </div>
-                    <div class="center"><input type="submit" class="btn-success" id="submit" name="submit" value="submit"></div>
+					 
+					 
+					 
+                 <div class="btn btn-primary btn-lg" align="center"> 
+     <input type="submit" class="btn btn-primary btn-lg" id="submit"  name="submit" href="#">
+    </div>
                   </div>
                   </fieldset>
                 </form> </div> </div></div>   </div>   </div>   </div> </div>                                        
